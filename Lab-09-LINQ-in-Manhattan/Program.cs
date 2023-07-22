@@ -11,27 +11,28 @@ class Program
     static void Main(string[] args)
     {
         string json = File.ReadAllText("../../../data.json"); // replace "data.json" with your file path
+
         ManhatanNeiborhoods? deserializedData = JsonConvert.DeserializeObject<ManhatanNeiborhoods>(json);
 
         if (deserializedData != null && deserializedData.features != null)
         {
-            var features = (from featureInfo in deserializedData.features
+            var neighborhoods = (from neighborhoodInfo in deserializedData.features
                             select new Feature
                             {
-                                type = featureInfo.type,
+                                type = neighborhoodInfo.type,
                                 geometry = new Geometry
                                 {
-                                    coordinates = featureInfo.geometry.coordinates
+                                    coordinates = neighborhoodInfo.geometry.coordinates
                                 },
                                 properties = new Properties
                                 {
-                                    zip = featureInfo.properties.zip,
-                                    city = featureInfo.properties.city,
-                                    state = featureInfo.properties.state,
-                                    address = featureInfo.properties.address,
-                                    borough = featureInfo.properties.borough,
-                                    neighborhood = featureInfo.properties.neighborhood,
-                                    county = featureInfo.properties.county
+                                    zip = neighborhoodInfo.properties.zip,
+                                    city = neighborhoodInfo.properties.city,
+                                    state = neighborhoodInfo.properties.state,
+                                    address = neighborhoodInfo.properties.address,
+                                    borough = neighborhoodInfo.properties.borough,
+                                    neighborhood = neighborhoodInfo.properties.neighborhood,
+                                    county = neighborhoodInfo.properties.county
                                 }
                             }).ToList();
 
@@ -44,23 +45,23 @@ class Program
             string action = Console.ReadLine();
 
 
-            if (features != null)
+            if (neighborhoods != null)
             {
                 switch (action)
                 {
 
                     case "1":
-                        AllNeighborhoods(features);
+                        AllNeighborhoods(neighborhoods);
                         break;
                     case "2":
-                        Filter_Out_All_The_Neighborhoods_With_No_Name(features);
+                        Filter_Out_All_The_Neighborhoods_With_No_Name(neighborhoods);
                         break;
 
                     case "3":
-                        RewriteAndConsolidate(features);
+                        RewriteAndConsolidate(neighborhoods);
                         break;
                     case "4":
-                        Using_Opposing_LINQ_Method(features);
+                        Using_Opposing_LINQ_Method(neighborhoods);
                         break;
 
                 }
@@ -74,24 +75,24 @@ class Program
     }
 
 
-    public static void AllNeighborhoods(List<Feature> features)
+    public static void AllNeighborhoods(List<Feature> neighborhoods)
     {
 
-        foreach (var item in features)
+        foreach (var neighborhood in neighborhoods)
         {
-            Console.WriteLine($"Type: {item.type}");
-            Console.WriteLine($"Coordinates: {item.geometry.ConcatinateCoordinates()}");
-            Console.WriteLine($"Zip: {item.properties.zip}");
-            Console.WriteLine($"City: {item.properties.city}");
-            Console.WriteLine($"State: {item.properties.state}");
-            Console.WriteLine($"Address: {item.properties.address}");
-            Console.WriteLine($"Borough: {item.properties.borough}");
-            Console.WriteLine($"Neighborhood: {item.properties.neighborhood}");
-            Console.WriteLine($"County: {item.properties.county}");
+            Console.WriteLine($"Type: {neighborhood.type}");
+            Console.WriteLine($"Coordinates: {neighborhood.geometry.ConcatinateCoordinates()}");
+            Console.WriteLine($"Zip: {neighborhood.properties.zip}");
+            Console.WriteLine($"City: {neighborhood.properties.city}");
+            Console.WriteLine($"State: {neighborhood.properties.state}");
+            Console.WriteLine($"Address: {neighborhood.properties.address}");
+            Console.WriteLine($"Borough: {neighborhood.properties.borough}");
+            Console.WriteLine($"Neighborhood: {neighborhood.properties.neighborhood}");
+            Console.WriteLine($"County: {neighborhood.properties.county}");
             Console.WriteLine("----------------------------------");
         }
 
-        Console.WriteLine("there are currently {0} neiborhoods in Manhatan", features.Count);
+        Console.WriteLine("there are currently {0} neiborhoods in Manhatan", neighborhoods.Count);
     }
 
 
@@ -99,24 +100,24 @@ class Program
 
     public static void Filter_Out_All_The_Neighborhoods_With_No_Name(List<Feature> query)
     {
-        var filterQuery = (from featureInfo in query
-                           where !string.IsNullOrWhiteSpace(featureInfo.properties.neighborhood)
+        var filterQuery = (from neighborhoodInfo in query
+                           where !string.IsNullOrWhiteSpace(neighborhoodInfo.properties.neighborhood)
                            select new Feature
                            {
-                               type = featureInfo.type,
+                               type = neighborhoodInfo.type,
                                geometry = new Geometry
                                {
-                                   coordinates = featureInfo.geometry.coordinates
+                                   coordinates = neighborhoodInfo.geometry.coordinates
                                },
                                properties = new Properties
                                {
-                                   zip = featureInfo.properties.zip,
-                                   city = featureInfo.properties.city,
-                                   state = featureInfo.properties.state,
-                                   address = featureInfo.properties.address,
-                                   borough = featureInfo.properties.borough,
-                                   neighborhood = featureInfo.properties.neighborhood,
-                                   county = featureInfo.properties.county
+                                   zip = neighborhoodInfo.properties.zip,
+                                   city = neighborhoodInfo.properties.city,
+                                   state = neighborhoodInfo.properties.state,
+                                   address = neighborhoodInfo.properties.address,
+                                   borough = neighborhoodInfo.properties.borough,
+                                   neighborhood = neighborhoodInfo.properties.neighborhood,
+                                   county = neighborhoodInfo.properties.county
                                }
                            }).ToList();
 
@@ -130,9 +131,9 @@ class Program
 
     public static void RemoveTheDuplicates(List<Feature> query)
     {
-        var noDuplicates = (from featureInfo in query
-                            where !string.IsNullOrEmpty(featureInfo.properties.neighborhood)
-                            group featureInfo by featureInfo.properties.neighborhood into noDups
+        var noDuplicates = (from neighborhoodInfo in query
+                            where !string.IsNullOrEmpty(neighborhoodInfo.properties.neighborhood)
+                            group neighborhoodInfo by neighborhoodInfo.properties.neighborhood into noDups
                             select noDups.First()).ToList();
         Console.WriteLine(noDuplicates.Count);
         AllNeighborhoods(noDuplicates);
@@ -143,9 +144,9 @@ class Program
 
     public static void RewriteAndConsolidate(List<Feature> query)
     {
-        var rewriteAndConsolidatedQuery = (from featureInfo in query
-                           where !string.IsNullOrWhiteSpace(featureInfo.properties.neighborhood)
-                           group featureInfo by featureInfo.properties.neighborhood into noDups
+        var rewriteAndConsolidatedQuery = (from neighborhoodInfo in query
+                           where !string.IsNullOrWhiteSpace(neighborhoodInfo.properties.neighborhood)
+                           group neighborhoodInfo by neighborhoodInfo.properties.neighborhood into noDups
 
                            select new Feature
                            {
@@ -173,8 +174,8 @@ class Program
     public static void Using_Opposing_LINQ_Method(List<Feature> query)
     {
 
-        var Opposing_Methods = query.Where( featureInfo => !string.IsNullOrWhiteSpace(featureInfo.properties.neighborhood)).GroupBy(
-                                           featureInfo => featureInfo.properties.neighborhood).Select( noDups =>
+        var Opposing_Methods = query.Where(neighborhoodInfo => !string.IsNullOrWhiteSpace(neighborhoodInfo.properties.neighborhood)).GroupBy(
+                                           neighborhoodInfo => neighborhoodInfo.properties.neighborhood).Select( noDups =>
 
                                             new Feature
                                            {
